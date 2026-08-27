@@ -21,8 +21,8 @@ st.markdown("""
         background-color: #FAF6F0;
     }
     
-    /* Font và màu chữ tối tương phản */
-    body, p, label, .quiz-card, .stRadio, div[role='radiogroup'] * {
+        /* Font và màu chữ tối tương phản cực kỳ rõ nét và đậm màu */
+    body, p, label, .quiz-card, h1, h2, h3, h4, h5, h6 {
         color: #111111 !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -32,92 +32,41 @@ st.markdown("""
         font-size: 18px !important;
     }
     
-    /* Chữ được chọn hiển thị trong hộp */
+    /* Chữ được chọn hiển thị trong hộp - ĐẬM ĐEN rõ nét */
     div[data-testid="stSelectbox"] div[role="button"] {
         font-size: 18px !important;
         color: #111111 !important;
         font-weight: bold !important;
     }
     
-    /* Khắc phục triệt để lỗi màu chữ nhạt/tối và tương phản kém ở bảng danh sách xổ xuống (cả Sáng/Tối) */
-    div[data-baseweb="popover"], 
-    div[data-baseweb="popover"] *, 
-    div[data-baseweb="menu"], 
-    div[data-baseweb="menu"] *, 
-    div[role="listbox"], 
-    div[role="listbox"] *, 
-    ul[role="listbox"],
-    ul[role="listbox"] *,
-    [role="option"], 
-    [role="option"] * {
+    /* Nền trắng và viền pastel xinh xắn cho bảng danh sách xổ xuống */
+    div[data-baseweb="popover"] ul, div[data-baseweb="menu"], ul[role="listbox"] {
         background-color: #FFFFFF !important;
+        border: 2px solid #FFD1DC !important;
+        border-radius: 12px !important;
+    }
+    
+    /* KHÓA CỨNG nền trắng và chữ đen đậm rõ nét cho tất cả các lựa chọn dropdown */
+    div[data-baseweb="popover"] li, ul[role="listbox"] li, [role="option"] {
+        background-color: #FFFFFF !important;
+        color: #111111 !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        padding: 12px 16px !important;
+    }
+    
+    /* Đảm bảo toàn bộ chữ bên trong li và option (kể cả nested spans/divs) đều có màu đen đậm */
+    div[data-baseweb="popover"] li *, [role="option"] * {
         color: #111111 !important;
         font-size: 18px !important;
         font-weight: bold !important;
     }
     
-    /* Hiệu ứng hover cho các tùy chọn trong danh sách */
-    [role="option"]:hover, 
-    [role="option"]:hover *, 
-    div[data-baseweb="popover"] li:hover,
-    div[data-baseweb="popover"] li:hover * {
+    /* Hiệu ứng di chuột vào lựa chọn (Hover) đổi sang màu hồng pastel nhạt */
+    div[data-baseweb="popover"] li:hover, ul[role="listbox"] li:hover, [role="option"]:hover,
+    div[data-baseweb="popover"] li:hover *, [role="option"]:hover * {
         background-color: #FFF1F3 !important;
         color: #111111 !important;
-    }
-    
-    /* Thiết kế thẻ Card cho mỗi câu hỏi */
-    .quiz-card {
-        background-color: #FFFFFF;
-        padding: 22px;
-        border-radius: 16px;
-        border-left: 6px solid #FFD1DC; /* Viền hồng pastel */
-        box-shadow: 0 4px 12px rgba(44, 62, 80, 0.04);
-        margin-bottom: 20px;
-    }
-    
-    /* Tiêu đề chính */
-    .main-title {
-        color: #4A5568 !important;
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 5px;
-    }
-    
-    /* Tiêu đề phụ */
-    .sub-title {
-        color: #718096 !important;
-        text-align: center;
-        font-style: italic;
-        margin-bottom: 25px;
-    }
-    
-    /* Banner đầu mỗi bài tập */
-    .lesson-banner {
-        background-color: #E8F5E9; /* Xanh lá pastel nhạt */
-        padding: 15px;
-        border-radius: 12px;
-        border-left: 5px solid #81C784;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-    
-    /* Footer ở cuối trang */
-    .footer {
-        text-align: center;
-        padding: 20px;
-        margin-top: 50px;
-        border-top: 1px solid #E2E8F0;
-        color: #A0AEC0 !important;
-        font-weight: 500;
-    }
-
-    /* Các expander giải thích câu sai */
-    .explanation-box {
-        background-color: #FFF9E6;
-        border: 1px solid #FFE082;
-        border-radius: 8px;
-        padding: 12px;
-        margin-top: 10px;
     }
     /* Che/An logo va cac nut o goc phai tren */
     header {visibility: hidden;}
@@ -271,26 +220,23 @@ QUESTIONS = {
 st.markdown("<h1 class='main-title'>BÀI TẬP GIÁO TRÌNH HÁN NGỮ (1)</h1>", unsafe_allow_html=True)
 st.markdown("<h3 class='sub-title'>Chúc các bạn làm bài vui và hiệu quả nha!</h3>", unsafe_allow_html=True)
 
-# Khởi tạo và tự động đồng bộ tên học sinh giữa các bộ đề một cách tuyệt đối
-# Giúp khắc phục triệt để lỗi nhập tên rồi vẫn không bấm gửi được do lệch trạng thái
+# Định nghĩa hàm callback đồng bộ tên học sinh cực kỳ ổn định và chống lỗi gửi bài
+def sync_student_name(lesson_id):
+    key = f"name_input_{lesson_id}"
+    val = st.session_state[key].strip()
+    st.session_state["student_name"] = val
+    for l_id in ['bai_8', 'bai_7', 'bai_6']:
+        st.session_state[f"name_input_{l_id}"] = val
+
+# Khởi tạo student_name trong session_state
 if "student_name" not in st.session_state:
     st.session_state["student_name"] = ""
 
-# Quét xem học sinh vừa cập nhật tên ở tab nào để làm giá trị chuẩn
-active_name = st.session_state["student_name"]
+# Đảm bảo các ô nhập tên được khởi tạo sẵn trong session_state
 for l_id in ['bai_8', 'bai_7', 'bai_6']:
-    key = f"name_input_{l_id}"
-    if key in st.session_state:
-        if st.session_state[key] != st.session_state["student_name"]:
-            active_name = st.session_state[key]
-            break
+    if f"name_input_{l_id}" not in st.session_state:
+        st.session_state[f"name_input_{l_id}"] = ""
 
-# Đồng bộ ngược lại giá trị chuẩn đó cho toàn bộ các tab và lưu trữ
-st.session_state["student_name"] = active_name
-for l_id in ['bai_8', 'bai_7', 'bai_6']:
-    st.session_state[f"name_input_{l_id}"] = active_name
-
-# Lấy biến chuẩn để phục vụ kiểm tra và lưu kết quả
 student_name = st.session_state["student_name"]
 
 # Thiết lập tabs: Bài mới nhất luôn ở bên trái ngoài cùng (Bài 8 -> Bài 7 -> Bài 6)
@@ -337,10 +283,12 @@ for lesson_id, tab in lessons_mapping:
         lesson_data = QUESTIONS[lesson_id]
         st.markdown(f"<div class='lesson-banner'>{lesson_data['title']}</div>", unsafe_allow_html=True)
         
-        # Đồng bộ ô nhập tên học sinh trên từng bộ đề tự động từ session_state chuẩn
+        # Đồng bộ ô nhập tên học sinh trên từng bộ đề tự động sử dụng callback 100% ổn định
         student_name = st.text_input(
             "📝 Nhập Họ và tên của bạn để làm bài tập:",
             key=f"name_input_{lesson_id}",
+            on_change=sync_student_name,
+            args=(lesson_id,),
             disabled=st.session_state.get(f"submitted_{lesson_id}", False)
         )
         
@@ -608,7 +556,9 @@ for lesson_id, tab in lessons_mapping:
         # --------------------------------------------------
         if not is_submitted:
             if st.button("📤 Nộp Bài Tập", key=f"submit_btn_{lesson_id}"):
-                if not student_name.strip():
+                # Luôn lấy giá trị tên từ nguồn session_state chuẩn để tránh lỗi mất trạng thái
+                current_student_name = st.session_state.get("student_name", "").strip()
+                if not current_student_name:
                     st.error("⚠️ Bạn vui lòng nhập Họ và tên ở đầu trang trước khi nộp bài nhé!")
                 else:
                     # Chấm điểm
@@ -638,7 +588,7 @@ for lesson_id, tab in lessons_mapping:
                     now = datetime.datetime.now() + datetime.timedelta(hours=7) # Quy đổi múi giờ GMT+7
                     payload = {
                         "timestamp": now.strftime("%Y-%m-%d %H:%M:%S"),
-                        "student_name": student_name,
+                        "student_name": current_student_name,
                         "lesson_title": lesson_data['title'],
                         "listening_score": f"{listening_score}/15",
                         "reading_score": f"{reading_score}/15",
@@ -670,7 +620,7 @@ for lesson_id, tab in lessons_mapping:
         else:
             # Đã nộp bài, hiển thị bảng điểm của học sinh
             st.markdown("### 📊 KẾT QUẢ BÀI LÀM CỦA BẠN")
-            st.markdown(f"👤 **Học sinh**: `{student_name}`")
+            st.markdown(f"👤 **Học sinh**: `{st.session_state.get('student_name', '')}`")
             st.markdown(f"🎧 **Điểm phần nghe**: `{scores['listening']}/15`")
             st.markdown(f"📖 **Điểm phần đọc**: `{scores['reading']}/15`")
             st.markdown(f"🏆 **Tổng điểm đạt được**: `{scores['total']}/30`")
