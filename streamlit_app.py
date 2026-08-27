@@ -22,8 +22,8 @@ st.markdown("""
     }
     
     /* Font và màu chữ tối tương phản */
-    body, p, label, .quiz-card {
-        color: #2c3e50 !important;
+    body, p, label, .quiz-card, .stRadio, div[role='radiogroup'] * {
+        color: #111111 !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
@@ -35,29 +35,34 @@ st.markdown("""
     /* Chữ được chọn hiển thị trong hộp */
     div[data-testid="stSelectbox"] div[role="button"] {
         font-size: 18px !important;
-        color: #2c3e50 !important;
+        color: #111111 !important;
         font-weight: bold !important;
     }
     
-    /* Nền trắng và viền pastel xinh xắn cho bảng danh sách xổ xuống */
-    div[data-baseweb="popover"] ul, div[data-baseweb="menu"], ul[role="listbox"] {
+    /* Khắc phục triệt để lỗi màu chữ nhạt/tối và tương phản kém ở bảng danh sách xổ xuống (cả Sáng/Tối) */
+    div[data-baseweb="popover"], 
+    div[data-baseweb="popover"] *, 
+    div[data-baseweb="menu"], 
+    div[data-baseweb="menu"] *, 
+    div[role="listbox"], 
+    div[role="listbox"] *, 
+    ul[role="listbox"],
+    ul[role="listbox"] *,
+    [role="option"], 
+    [role="option"] * {
         background-color: #FFFFFF !important;
-        border: 2px solid #FFD1DC !important;
-        border-radius: 12px !important;
-    }
-    
-    /* Chữ của từng lựa chọn trong bảng danh sách xổ xuống to, rõ nét, màu tối */
-    div[data-baseweb="popover"] li, ul[role="listbox"] li, [role="option"] {
+        color: #111111 !important;
         font-size: 18px !important;
-        color: #2c3e50 !important;
-        font-weight: 600 !important;
-        padding: 12px 16px !important;
+        font-weight: bold !important;
     }
     
-    /* Hiệu ứng di chuột vào lựa chọn (Hover) đổi sang màu hồng pastel nhạt */
-    div[data-baseweb="popover"] li:hover, ul[role="listbox"] li:hover, [role="option"]:hover {
+    /* Hiệu ứng hover cho các tùy chọn trong danh sách */
+    [role="option"]:hover, 
+    [role="option"]:hover *, 
+    div[data-baseweb="popover"] li:hover,
+    div[data-baseweb="popover"] li:hover * {
         background-color: #FFF1F3 !important;
-        color: #2c3e50 !important;
+        color: #111111 !important;
     }
     
     /* Thiết kế thẻ Card cho mỗi câu hỏi */
@@ -266,16 +271,27 @@ QUESTIONS = {
 st.markdown("<h1 class='main-title'>BÀI TẬP GIÁO TRÌNH HÁN NGỮ (1)</h1>", unsafe_allow_html=True)
 st.markdown("<h3 class='sub-title'>Chúc các bạn làm bài vui và hiệu quả nha!</h3>", unsafe_allow_html=True)
 
-# Khởi tạo student_name trong session_state
+# Khởi tạo và tự động đồng bộ tên học sinh giữa các bộ đề một cách tuyệt đối
+# Giúp khắc phục triệt để lỗi nhập tên rồi vẫn không bấm gửi được do lệch trạng thái
 if "student_name" not in st.session_state:
     st.session_state["student_name"] = ""
-student_name = st.session_state["student_name"]
 
-def sync_student_name(key_updated):
-    val = st.session_state[key_updated]
-    st.session_state["student_name"] = val
-    for l_id in ['bai_8', 'bai_7', 'bai_6']:
-        st.session_state[f"name_input_{l_id}"] = val
+# Quét xem học sinh vừa cập nhật tên ở tab nào để làm giá trị chuẩn
+active_name = st.session_state["student_name"]
+for l_id in ['bai_8', 'bai_7', 'bai_6']:
+    key = f"name_input_{l_id}"
+    if key in st.session_state:
+        if st.session_state[key] != st.session_state["student_name"]:
+            active_name = st.session_state[key]
+            break
+
+# Đồng bộ ngược lại giá trị chuẩn đó cho toàn bộ các tab và lưu trữ
+st.session_state["student_name"] = active_name
+for l_id in ['bai_8', 'bai_7', 'bai_6']:
+    st.session_state[f"name_input_{l_id}"] = active_name
+
+# Lấy biến chuẩn để phục vụ kiểm tra và lưu kết quả
+student_name = st.session_state["student_name"]
 
 # Thiết lập tabs: Bài mới nhất luôn ở bên trái ngoài cùng (Bài 8 -> Bài 7 -> Bài 6)
 tabs = st.tabs(["📚 BÀI 8", "📚 BÀI 7", "📚 BÀI 6"])
@@ -321,18 +337,12 @@ for lesson_id, tab in lessons_mapping:
         lesson_data = QUESTIONS[lesson_id]
         st.markdown(f"<div class='lesson-banner'>{lesson_data['title']}</div>", unsafe_allow_html=True)
         
-        # Đồng bộ ô nhập tên học sinh trên từng bộ đề
-        if f"name_input_{lesson_id}" not in st.session_state:
-            st.session_state[f"name_input_{lesson_id}"] = st.session_state.get("student_name", "")
-            
+        # Đồng bộ ô nhập tên học sinh trên từng bộ đề tự động từ session_state chuẩn
         student_name = st.text_input(
             "📝 Nhập Họ và tên của bạn để làm bài tập:",
             key=f"name_input_{lesson_id}",
-            on_change=sync_student_name,
-            args=(f"name_input_{lesson_id}",),
             disabled=st.session_state.get(f"submitted_{lesson_id}", False)
         )
-        st.session_state.student_name = student_name
         
         # Biến trạng thái nộp bài của bài cụ thể
         is_submitted = st.session_state[f"submitted_{lesson_id}"]
