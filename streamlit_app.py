@@ -22,9 +22,42 @@ st.markdown("""
     }
     
     /* Font và màu chữ tối tương phản */
-    body, p, div, span, label {
-        color: #2c3e50;
+    body, p, label, .quiz-card {
+        color: #2c3e50 !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    /* Tối ưu hóa chữ hiển thị trong hộp chọn Selectbox của Streamlit */
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] {
+        font-size: 18px !important;
+    }
+    
+    /* Chữ được chọn hiển thị trong hộp */
+    div[data-testid="stSelectbox"] div[role="button"] {
+        font-size: 18px !important;
+        color: #2c3e50 !important;
+        font-weight: bold !important;
+    }
+    
+    /* Nền trắng và viền pastel xinh xắn cho bảng danh sách xổ xuống */
+    div[data-baseweb="popover"] ul, div[data-baseweb="menu"], ul[role="listbox"] {
+        background-color: #FFFFFF !important;
+        border: 2px solid #FFD1DC !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Chữ của từng lựa chọn trong bảng danh sách xổ xuống to, rõ nét, màu tối */
+    div[data-baseweb="popover"] li, ul[role="listbox"] li, [role="option"] {
+        font-size: 18px !important;
+        color: #2c3e50 !important;
+        font-weight: 600 !important;
+        padding: 12px 16px !important;
+    }
+    
+    /* Hiệu ứng di chuột vào lựa chọn (Hover) đổi sang màu hồng pastel nhạt */
+    div[data-baseweb="popover"] li:hover, ul[role="listbox"] li:hover, [role="option"]:hover {
+        background-color: #FFF1F3 !important;
+        color: #2c3e50 !important;
     }
     
     /* Thiết kế thẻ Card cho mỗi câu hỏi */
