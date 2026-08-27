@@ -244,6 +244,9 @@ def sync_student_name(key_updated):
     for l_id in ['bai_8', 'bai_7', 'bai_6']:
         st.session_state[f"name_input_{l_id}"] = val
 
+# Thiết lập tabs: Bài mới nhất luôn ở bên trái ngoài cùng (Bài 8 -> Bài 7 -> Bài 6)
+tabs = st.tabs(["📚 BÀI 8", "📚 BÀI 7", "📚 BÀI 6"])
+
 lessons_mapping = [('bai_8', tabs[0]), ('bai_7', tabs[1]), ('bai_6', tabs[2])]
 
 # Khởi tạo các biến session state cho từng bài học nếu chưa tồn tại
