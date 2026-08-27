@@ -332,7 +332,7 @@ for lesson_id, tab in lessons_mapping:
             else:
                 st.info(f"💡 [Gợi ý giáo viên]: Thêm ảnh đặt tên là '{img_path}' vào thư mục để hiển thị hình câu này.")
                 
-            st.markdown(f"**{q['text']}**")
+            st.markdown(f"**{q['id']}.**")
             
             selected_option = st.radio(
                 "Lựa chọn của bạn:",
@@ -420,7 +420,7 @@ for lesson_id, tab in lessons_mapping:
                 st.session_state[q_key] = "Chưa chọn"
                 
             st.markdown("<div class='quiz-card'>", unsafe_allow_html=True)
-            st.markdown(f"**{q['text']}**") # In đậm câu hỏi
+            st.markdown(f"**{q['id']}.**") # In đậm câu hỏi
             
             selected_option = st.radio(
                 "Chọn đáp án đúng (A/B/C):",
