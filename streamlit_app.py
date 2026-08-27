@@ -80,6 +80,12 @@ st.markdown("""
         padding: 12px;
         margin-top: 10px;
     }
+    /* Che/An logo va cac nut o goc phai tren */
+    header {visibility: hidden;}
+    [data-testid="stHeader"] {display: none;}
+    #MainMenu {visibility: hidden;}
+    .stDeployButton {display: none;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -239,6 +245,13 @@ tabs = st.tabs(["📚 BÀI 8", "📚 BÀI 7", "📚 BÀI 6"])
 # 4. VÒNG LẶP RENDER TỪNG TAB BÀI HỌC
 # ==========================================================
 lessons_mapping = [('bai_8', tabs[0]), ('bai_7', tabs[1]), ('bai_6', tabs[2])]
+
+# Khoi tao cac bien session state cho tung bai hoc neu chua ton tai
+for l_id in ['bai_8', 'bai_7', 'bai_6']:
+    if f"submitted_{l_id}" not in st.session_state:
+        st.session_state[f"submitted_{l_id}"] = False
+    if f"scores_{l_id}" not in st.session_state:
+        st.session_state[f"scores_{l_id}"] = None
 
 for lesson_id, tab in lessons_mapping:
     with tab:
